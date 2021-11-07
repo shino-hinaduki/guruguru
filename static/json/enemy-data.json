@@ -2,28 +2,40 @@
   "version": "0.0.1",
   "data": [
     {
-      "name": "Geochanter",
-      "category": "Fatui",
-      "element": "Geo",
-      "url": "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Geochanter_Bracer_Icon.png"
-    },
-    {
-      "name": "Pyroslinger",
-      "category": "Fatui",
-      "element": "Pyro",
-      "url": "https://static.wikia.nocookie.net/gensin-impact/images/5/53/Enemy_Fatui_Pyroslinger_Bracer_Icon.png"
-    },
-    {
       "name": "Anemoboxer Vanguard",
-      "category": "Fatui",
+      "category": "Fatui Skirmishers",
       "element": "Anemo",
       "url": "https://static.wikia.nocookie.net/gensin-impact/images/9/96/Enemy_Fatui_Anemoboxer_Vanguard_Icon.png"
     },
     {
       "name": "Electrohammer Vanguard",
-      "category": "Fatui",
+      "category": "Fatui Skirmishers",
       "element": "Electro",
       "url": "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Electrohammer_Vanguard_Icon.png"
+    },
+    {
+      "name": "Geochanter Bracer",
+      "category": "Fatui Skirmishers",
+      "element": "Geo",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Geochanter_Bracer_Icon.png"
+    },
+    {
+      "name": "Pyroslinger Bracer",
+      "category": "Fatui Skirmishers",
+      "element": "Pyro",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/5/53/Enemy_Fatui_Pyroslinger_Bracer_Icon.png"
+    },
+    {
+      "name": "Cryogunner Legionnaire",
+      "category": "Fatui Skirmishers",
+      "element": "Cryo",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/d/d1/Enemy_Fatui_Cryogunner_Legionnaire_Icon.png"
+    },
+    {
+      "name": "Hydrogunner Legionnaire",
+      "category": "Fatui Skirmishers",
+      "element": "Hydro",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/5/5c/Enemy_Fatui_Hydrogunner_Legionnaire_Icon.png"
     }
   ]
 }

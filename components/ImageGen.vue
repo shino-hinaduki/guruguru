@@ -33,7 +33,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="name" sortable label="Name">
-            <template slot="header" slot-scope="props">
+            <template slot="header">
               <el-input
                 v-model="search"
                 size="mini"
@@ -60,7 +60,6 @@
 
 <script>
 import { default as enemyData } from "@/static/json/enemy-data.json";
-
 export default {
   methods: {},
   data() {

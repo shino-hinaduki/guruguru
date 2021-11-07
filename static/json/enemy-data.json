@@ -2,13 +2,27 @@
   "version": "0.0.1",
   "data": [
     {
+      "name": "Geochanter",
+      "category": "Fatui",
+      "element": "Geo",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Geochanter_Bracer_Icon.png"
+    },
+    {
+      "name": "Pyroslinger",
+      "category": "Fatui",
+      "element": "Pyro",
+      "url": "https://static.wikia.nocookie.net/gensin-impact/images/5/53/Enemy_Fatui_Pyroslinger_Bracer_Icon.png"
+    },
+    {
       "name": "Anemoboxer Vanguard",
-      "tag": "Fatui",
+      "category": "Fatui",
+      "element": "Anemo",
       "url": "https://static.wikia.nocookie.net/gensin-impact/images/9/96/Enemy_Fatui_Anemoboxer_Vanguard_Icon.png"
     },
     {
       "name": "Electrohammer Vanguard",
-      "tag": "Fatui",
+      "category": "Fatui",
+      "element": "Electro",
       "url": "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Electrohammer_Vanguard_Icon.png"
     }
   ]

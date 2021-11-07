@@ -10,7 +10,18 @@
 
     <el-row :gutter="10" align="middle">
       <el-col>
-        <el-table :data="tableData" style="width: 100%">
+        <el-table
+          :data="
+            tableData.filter(
+              (data) =>
+                !search ||
+                data.name.toLowerCase().includes(search.toLowerCase()) ||
+                data.tag.toLowerCase().includes(search.toLowerCase())
+            )
+          "
+          :default-sort="{ prop: 'name', order: 'descending' }"
+          style="width: 100%"
+        >
           <el-table-column fixed="left" label="Icon" width="100px">
             <template slot-scope="props">
               <el-image
@@ -21,10 +32,19 @@
               ></el-image>
             </template>
           </el-table-column>
-          <el-table-column prop="name" label="Name"> </el-table-column>
-          <el-table-column prop="tag" label="Tag"> </el-table-column>
+          <el-table-column prop="name" sortable label="Name">
+            <template slot="header" slot-scope="_">
+              <el-input
+                v-model="search"
+                size="mini"
+                placeholder="Name (Type to search)"
+                style="width: 90%"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="tag" sortable label="Tag"> </el-table-column>
           <el-table-column fixed="right" label="Operations" width="120">
-            <el-button type="text">Add</el-button>
+            <el-button type="primary" icon="el-icon-plus">Add</el-button>
           </el-table-column>
         </el-table>
       </el-col>
@@ -37,11 +57,17 @@ export default {
   methods: {},
   data() {
     return {
+      search: "",
       tableData: [
         {
           name: "Anemoboxer Vanguard",
           tag: "Fatui",
           url: "https://static.wikia.nocookie.net/gensin-impact/images/9/96/Enemy_Fatui_Anemoboxer_Vanguard_Icon.png",
+        },
+        {
+          name: "Electrohammer Vanguard",
+          tag: "Fatui",
+          url: "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Electrohammer_Vanguard_Icon.png",
         },
       ],
     };

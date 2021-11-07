@@ -53,23 +53,14 @@
 </template>
 
 <script>
+import * as enemyData from "@/static/json/enemy-data.json";
+
 export default {
   methods: {},
   data() {
     return {
       search: "",
-      tableData: [
-        {
-          name: "Anemoboxer Vanguard",
-          tag: "Fatui",
-          url: "https://static.wikia.nocookie.net/gensin-impact/images/9/96/Enemy_Fatui_Anemoboxer_Vanguard_Icon.png",
-        },
-        {
-          name: "Electrohammer Vanguard",
-          tag: "Fatui",
-          url: "https://static.wikia.nocookie.net/gensin-impact/images/a/a2/Enemy_Fatui_Electrohammer_Vanguard_Icon.png",
-        },
-      ],
+      tableData: enemyData.data,
     };
   },
 };

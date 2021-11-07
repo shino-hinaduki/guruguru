@@ -1,7 +1,9 @@
 {
   "name": "guruguru",
   "version": "1.0.0",
-  "private": true,
+  "repository": "https://github.com/shino-hinaduki/guruguru",
+  "author": "shino-hinaduki",
+  "license": "CC BY-SA 3.0",
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",

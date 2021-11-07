@@ -1,5 +1,5 @@
 <template>
-  <Tutorial/>
+  <ImageGen/>
 </template>
 
 <script lang="ts">

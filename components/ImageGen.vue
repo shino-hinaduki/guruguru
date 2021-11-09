@@ -8,6 +8,8 @@
       <el-menu-item index="5" disabled>Info</el-menu-item>
     </el-menu>
 
+    <canvas ref="drawCanvas" width="640" height="320"></canvas>
+
     <el-row :gutter="10" align="middle">
       <el-col>
         <el-table
@@ -59,7 +61,9 @@
 </template>
 
 <script>
+import { fabric } from "fabric";
 import { default as enemyData } from "@/static/json/enemy-data.json";
+
 export default {
   methods: {},
   data() {
@@ -67,6 +71,21 @@ export default {
       search: "",
       tableData: enemyData.data,
     };
+  },
+  mounted() {
+    const drawCanvas = new fabric.Canvas(this.$refs.drawCanvas);
+    drawCanvas.add(
+      new fabric.Rect({
+        fill: "green",
+        width: 100,
+        height: 100,
+        rx: 5,
+        ry: 5,
+        top: 20,
+        left: 60,
+      })
+    );
+    drawCanvas.add(new fabric.Text("Hello Fabric"));
   },
 };
 </script>

@@ -1,6 +1,6 @@
 # guruguru
 
-Genshin Impact Battlefield Layout Image Generator
+(Unofficial) Genshin Impact Battlefield Layout Image Generator
 
 ## License
 

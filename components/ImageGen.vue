@@ -157,9 +157,18 @@ export default {
       const jsonStr = "";
       this.fabricCanvas.loadFromJSON(jsonStr, () => {});
     },
+    // 編集中のデータを破棄
     clearImage() {
-      // TODO: 確認Dialog
-      this.fabricCanvas.clear();
+      this.$confirm(
+        "Do you want to discard the data being edited?",
+        "Confirm",
+        {
+          confirmButtonText: "Yes",
+          cancelButtonText: "No",
+        }
+      ).then(() => {
+        this.fabricCanvas.clear();
+      });
     },
     // localStorageにデータが残っている場合、復元しておく
     importFromLocalStorage() {

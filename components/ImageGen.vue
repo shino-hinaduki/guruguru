@@ -115,9 +115,11 @@ export default {
     this.importFromLocalStorage();
   },
   methods: {
+    // 指定されたurlを新規タブで開きます
     moveLink(url) {
       window.open(url, "_blank");
     },
+    // 編集中の画像を保存します
     saveImage() {
       // TODO:
       console.log(this.fabricCanvas.toDataURL());
@@ -152,12 +154,21 @@ export default {
         "Export Notice"
       );
     },
+    // Json Textから編集データを復元します
     importFromJSON() {
-      // TODO: JSON入力
-      const jsonStr = "";
-      this.fabricCanvas.loadFromJSON(jsonStr, () => {});
+      this.$prompt("Please paste the Json text output by 'Export'", "Import", {
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
+      }).then(({ value }) => {
+        try {
+          this.fabricCanvas.loadFromJSON(value, () => {});
+        } catch (error) {
+          console.error(error);
+          this.$alert(error, "Import Notice");
+        }
+      });
     },
-    // 編集中のデータを破棄
+    // 編集中のデータを破棄します
     clearImage() {
       this.$confirm(
         "Do you want to discard the data being edited?",
@@ -170,7 +181,7 @@ export default {
         this.fabricCanvas.clear();
       });
     },
-    // localStorageにデータが残っている場合、復元しておく
+    // localStorageにデータが残っている場合、復元します
     importFromLocalStorage() {
       // localStorageが使えない場合
       if (!window.localStorage) {
@@ -191,13 +202,18 @@ export default {
         try {
           this.fabricCanvas.loadFromJSON(JSON.parse(jsonData), () => {});
         } catch (err) {
+          this.$alert(
+            "Failed to restore data from automatic backup.",
+            "Warning"
+          );
+
           console.error('localStorage.getItem("fabricCanvasData") is Invalid:');
           console.error(err, jsonData);
           console.error("fabricCanvasData=", jsonData);
         }
       }
     },
-    // localStorageが使える場合、保持しておく
+    // localStorageが使える場合、内容を保存しておきます
     exportToLocalStorage() {
       if (window.localStorage && this.isEnableBackup) {
         // 編集中フラグの削除
@@ -208,7 +224,7 @@ export default {
         localStorage.setItem("fabricCanvasData", JSON.stringify(jsonData));
       }
     },
-    // 強引にバックアップ機能が有効になるようにする
+    // 強引にバックアップ機能が有効になるよう設定します
     forceActivateBackup() {
       this.isEnableBackup = true;
     },

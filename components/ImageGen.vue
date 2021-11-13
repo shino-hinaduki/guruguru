@@ -6,13 +6,13 @@
         @click="moveLink('https://github.com/shino-hinaduki/guruguru')"
         >guruguru</el-menu-item
       >
-      <el-menu-item index="2" disabled>Save</el-menu-item>
-      <el-menu-item index="2" disabled>Import</el-menu-item>
-      <el-menu-item index="3" disabled>Export</el-menu-item>
-      <el-menu-item index="4" disabled>Clear</el-menu-item>
+      <el-menu-item index="2" @click="saveImage">Save</el-menu-item>
+      <el-menu-item index="3" @click="importImage">Import</el-menu-item>
+      <el-menu-item index="4" @click="exportImage">Export</el-menu-item>
+      <el-menu-item index="5" @click="clearImage">Clear</el-menu-item>
     </el-menu>
 
-    <canvas ref="drawCanvas" width="640" height="320"></canvas>
+    <canvas ref="canvas" width="640" height="320"></canvas>
 
     <el-row :gutter="10" align="middle">
       <el-col>
@@ -69,20 +69,22 @@ import { fabric } from "fabric";
 import { default as enemyData } from "@/static/json/enemy-data.json";
 
 export default {
-  methods: {
-    moveLink(url) {
-      window.open(url, "_blank");
-    },
-  },
   data() {
     return {
       search: "",
       tableData: enemyData.data,
+      fabricCanvas: null,
     };
   },
+  created() {
+    window.addEventListener("beforeunload", this.exportToLocalStorage);
+  },
+  destroyed() {
+    window.removeEventListener("beforeunload", this.exportToLocalStorage);
+  },
   mounted() {
-    const drawCanvas = new fabric.Canvas(this.$refs.drawCanvas);
-    drawCanvas.add(
+    const fabricCanvas = new fabric.Canvas(this.$refs.canvas);
+    fabricCanvas.add(
       new fabric.Rect({
         fill: "green",
         width: 100,
@@ -93,7 +95,56 @@ export default {
         left: 60,
       })
     );
-    drawCanvas.add(new fabric.Text("Hello Fabric"));
+    fabricCanvas.add(new fabric.Text("Hello Fabric"));
+    this.fabricCanvas = fabricCanvas;
+    this.importFromLocalStorage();
+  },
+  methods: {
+    moveLink(url) {
+      window.open(url, "_blank");
+    },
+    saveImage() {
+      // TODO:
+      console.log(this.fabricCanvas.toDataURL());
+    },
+    exportImage() {
+      // TODO:
+      console.log(this.fabricCanvas.toJSON());
+    },
+    importImage() {
+      // TODO: JSON入力
+      const jsonStr = "";
+      this.fabricCanvas.loadFromJSON(jsonStr, () => {});
+    },
+    clearImage() {
+      // TODO: 確認Dialog
+      this.fabricCanvas.clear();
+    },
+    // localStorageが使える場合、保持しておく
+    exportToLocalStorage() {
+      if (window.localStorage) {
+        const jsonData = this.fabricCanvas.toJSON();
+        alert(jsonData);
+        localStorage.setItem("fabricCanvasData", JSON.stringify(jsonData));
+      }
+    },
+    // localStorageにデータが残っている場合、復元しておく
+    importFromLocalStorage() {
+      if (window.localStorage) {
+        const jsonData = localStorage.getItem("fabricCanvasData");
+        if (jsonData) {
+          try {
+            this.fabricCanvas.loadFromJSON(JSON.parse(jsonData), () => {});
+          } catch (err) {
+            console.error(
+              'localStorage.getItem("fabricCanvasData") is Invalid:'
+            );
+            console.error(err, jsonData);
+            console.error("fabricCanvasData=", jsonData);
+          }
+        }
+      }
+    },
   },
 };
 </script>

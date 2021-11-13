@@ -7,8 +7,8 @@
         >guruguru</el-menu-item
       >
       <el-menu-item index="2" @click="saveImage">Save</el-menu-item>
-      <el-menu-item index="3" @click="importImage">Import</el-menu-item>
-      <el-menu-item index="4" @click="exportImage">Export</el-menu-item>
+      <el-menu-item index="3" @click="importFromJSON">Import</el-menu-item>
+      <el-menu-item index="4" @click="exportToJSON">Export</el-menu-item>
       <el-menu-item index="5" @click="clearImage">Clear</el-menu-item>
     </el-menu>
     <el-alert
@@ -122,11 +122,37 @@ export default {
       // TODO:
       console.log(this.fabricCanvas.toDataURL());
     },
-    exportImage() {
-      // TODO:
-      console.log(this.fabricCanvas.toJSON());
+    // 現在の編集データを保存します
+    exportToJSON() {
+      const jsonStr = JSON.stringify(this.fabricCanvas.toJSON());
+
+      // clipboard対応要否に関わらず、consoleには出力しておく
+      console.info(
+        "//////////////////////////////////////////////////////////////////////"
+      );
+      console.info("// Here is the export data.");
+      console.info(jsonStr);
+      console.info(
+        "//////////////////////////////////////////////////////////////////////"
+      );
+
+      // Clipboard API非対応
+      if (!navigator.clipboard) {
+        this.$alert(
+          "Output to the developer console because the clipboard API is not supported.",
+          "Export Notice"
+        );
+        return;
+      }
+
+      // クリップボードにコピー
+      navigator.clipboard.writeText(jsonStr);
+      this.$alert(
+        "The data being edited has been copied to the clipboard.",
+        "Export Notice"
+      );
     },
-    importImage() {
+    importFromJSON() {
       // TODO: JSON入力
       const jsonStr = "";
       this.fabricCanvas.loadFromJSON(jsonStr, () => {});

@@ -1,11 +1,15 @@
 <template>
   <div>
     <el-menu mode="horizontal">
-      <el-menu-item index="1">shino-hinaduki.github.io/guruguru</el-menu-item>
+      <el-menu-item
+        index="1"
+        @click="moveLink('https://github.com/shino-hinaduki/guruguru')"
+        >guruguru</el-menu-item
+      >
+      <el-menu-item index="2" disabled>Save</el-menu-item>
       <el-menu-item index="2" disabled>Import</el-menu-item>
       <el-menu-item index="3" disabled>Export</el-menu-item>
       <el-menu-item index="4" disabled>Clear</el-menu-item>
-      <el-menu-item index="5" disabled>Info</el-menu-item>
     </el-menu>
 
     <canvas ref="drawCanvas" width="640" height="320"></canvas>
@@ -65,7 +69,11 @@ import { fabric } from "fabric";
 import { default as enemyData } from "@/static/json/enemy-data.json";
 
 export default {
-  methods: {},
+  methods: {
+    moveLink(url) {
+      window.open(url, "_blank");
+    },
+  },
   data() {
     return {
       search: "",

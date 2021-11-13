@@ -11,7 +11,15 @@
       <el-menu-item index="4" @click="exportImage">Export</el-menu-item>
       <el-menu-item index="5" @click="clearImage">Clear</el-menu-item>
     </el-menu>
-
+    <el-alert
+      v-if="!isEnableBackup"
+      @close="forceActivateBackup"
+      title="Automatic backup is disabled."
+      type="warning"
+      description="You may already be editing in another tab, or localStorage may not be available. When this message is closed, it will forcefully enable automatic backup."
+      show-icon
+    >
+    </el-alert>
     <canvas ref="canvas" width="640" height="320"></canvas>
 
     <el-row :gutter="10" align="middle">
@@ -71,9 +79,14 @@ import { default as enemyData } from "@/static/json/enemy-data.json";
 export default {
   data() {
     return {
+      // 挿入対象の検索文字列
       search: "",
+      // 挿入可能なエントリ一覧
       tableData: enemyData.data,
+      // 編集中のfabric.Canvas
       fabricCanvas: null,
+      // ページが閉じられた場合に自動で最新の編集データをlocalStorageに退避する
+      isEnableBackup: true,
     };
   },
   created() {
@@ -95,7 +108,9 @@ export default {
         left: 60,
       })
     );
-    fabricCanvas.add(new fabric.Text("Hello Fabric"));
+    fabricCanvas.add(
+      new fabric.Text("https://github.com/shino-hinaduki/guruguru")
+    );
     this.fabricCanvas = fabricCanvas;
     this.importFromLocalStorage();
   },
@@ -120,30 +135,47 @@ export default {
       // TODO: 確認Dialog
       this.fabricCanvas.clear();
     },
+    // localStorageにデータが残っている場合、復元しておく
+    importFromLocalStorage() {
+      // localStorageが使えない場合
+      if (!window.localStorage) {
+        this.isEnableBackup = false;
+        return;
+      }
+
+      // 編集中のタブがすでに存在する場合、Backup機能は無効化する
+      const isEdit = localStorage.getItem("isEdit");
+      if (isEdit) {
+        this.isEnableBackup = false;
+      }
+      localStorage.setItem("isEdit", true);
+
+      // データの読み出し
+      const jsonData = localStorage.getItem("fabricCanvasData");
+      if (jsonData) {
+        try {
+          this.fabricCanvas.loadFromJSON(JSON.parse(jsonData), () => {});
+        } catch (err) {
+          console.error('localStorage.getItem("fabricCanvasData") is Invalid:');
+          console.error(err, jsonData);
+          console.error("fabricCanvasData=", jsonData);
+        }
+      }
+    },
     // localStorageが使える場合、保持しておく
     exportToLocalStorage() {
-      if (window.localStorage) {
+      if (window.localStorage && this.isEnableBackup) {
+        // 編集中フラグの削除
+        localStorage.removeItem("isEdit");
+        // データの保存
         const jsonData = this.fabricCanvas.toJSON();
         alert(jsonData);
         localStorage.setItem("fabricCanvasData", JSON.stringify(jsonData));
       }
     },
-    // localStorageにデータが残っている場合、復元しておく
-    importFromLocalStorage() {
-      if (window.localStorage) {
-        const jsonData = localStorage.getItem("fabricCanvasData");
-        if (jsonData) {
-          try {
-            this.fabricCanvas.loadFromJSON(JSON.parse(jsonData), () => {});
-          } catch (err) {
-            console.error(
-              'localStorage.getItem("fabricCanvasData") is Invalid:'
-            );
-            console.error(err, jsonData);
-            console.error("fabricCanvasData=", jsonData);
-          }
-        }
-      }
+    // 強引にバックアップ機能が有効になるようにする
+    forceActivateBackup() {
+      this.isEnableBackup = true;
     },
   },
 };

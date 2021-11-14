@@ -26,7 +26,9 @@
         When this message is closed, it will forcefully enable automatic backup.
       </p>
     </el-alert>
-    <canvas ref="canvas" width="640" height="320"></canvas>
+    <div id="wrapper">
+      <canvas ref="canvas" width="640" height="320"></canvas>
+    </div>
 
     <el-row :gutter="10" align="middle">
       <el-col>
@@ -78,6 +80,17 @@
   </div>
 </template>
 
+<style>
+#wrapper {
+  border: solid 1px;
+  border-color: #cccccc;
+  width: 90vw;
+  height: 50vh;
+  overflow: auto;
+  resize: both;
+}
+</style>
+
 <script>
 import { fabric } from "fabric";
 import { default as enemyData } from "@/static/json/enemy-data.json";
@@ -102,7 +115,12 @@ export default {
     window.removeEventListener("beforeunload", this.exportToLocalStorage);
   },
   mounted() {
-    const fabricCanvas = new fabric.Canvas(this.$refs.canvas);
+    // initialize canvas
+    const canvasElem = this.$refs.canvas;
+    const fabricCanvas = new fabric.Canvas(canvasElem);
+    this.fabricCanvas = fabricCanvas;
+
+    // insert test objects. TODO: remove
     fabricCanvas.add(
       new fabric.Rect({
         fill: "green",
@@ -117,7 +135,15 @@ export default {
     fabricCanvas.add(
       new fabric.Text("https://github.com/shino-hinaduki/guruguru")
     );
-    this.fabricCanvas = fabricCanvas;
+
+    // enable resize
+    const resizeObserver = new ResizeObserver((entries) => {
+      fabricCanvas.setWidth(entries[0].contentRect.width);
+      fabricCanvas.setHeight(entries[0].contentRect.height);
+    });
+    resizeObserver.observe(document.getElementById("wrapper"));
+
+    // Import from auto backup
     this.importFromLocalStorage();
   },
   methods: {

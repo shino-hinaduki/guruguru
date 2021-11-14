@@ -4,7 +4,6 @@
 
 <script>
 import { default as elementData } from "@/static/json/element-data.json";
-console.log(elementData.data);
 
 export default {
   data() {

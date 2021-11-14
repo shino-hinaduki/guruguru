@@ -16,9 +16,15 @@
       @close="forceActivateBackup"
       title="Automatic backup is disabled."
       type="warning"
-      description="You may already be editing in another tab, or localStorage may not be available. When this message is closed, it will forcefully enable automatic backup."
       show-icon
     >
+      <p>
+        You may already be editing in another tab, or localStorage may not be
+        available.
+      </p>
+      <p>
+        When this message is closed, it will forcefully enable automatic backup.
+      </p>
     </el-alert>
     <canvas ref="canvas" width="640" height="320"></canvas>
 
@@ -121,8 +127,23 @@ export default {
     },
     // 編集中の画像を保存します
     saveImage() {
-      // TODO:
-      console.log(this.fabricCanvas.toDataURL());
+      // a tagでpngをbase64したものを付与したimage/octet-streamを開かせる
+      const dataUrl = this.fabricCanvas.toDataURL(); // data:image/png;base64,......
+      const nowDate = new Date()
+        .toISOString() // 2021-11-14T12:00:00.000Z
+        .split(".")[0] // 2021-11-14T12:00:00
+        .replace("T", "_") // 2021-11-14_12:00:00
+        .replace(":", "-"); // 2021-11-14_12-00-00
+      const link = document.createElement("a");
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.setAttribute("download", `guruguru_${nowDate}.png`);
+      link.setAttribute(
+        "href",
+        dataUrl.replace("image/png", "image/octet-stream")
+      );
+      link.click();
+      document.body.removeChild(link);
     },
     // 現在の編集データを保存します
     exportToJSON() {

@@ -6,10 +6,24 @@
         @click="moveLink('https://github.com/shino-hinaduki/guruguru')"
         >guruguru</el-menu-item
       >
-      <el-menu-item index="2" @click="saveImage">Save</el-menu-item>
-      <el-menu-item index="3" @click="importFromJSON">Import</el-menu-item>
-      <el-menu-item index="4" @click="exportToJSON">Export</el-menu-item>
-      <el-menu-item index="5" @click="clearImage">Clear</el-menu-item>
+      <el-submenu index="2">
+        <template slot="title">File</template>
+        <el-menu-item index="2-1" @click="saveImage">Save</el-menu-item>
+        <el-menu-item index="2-2" @click="importFromJSON">Import</el-menu-item>
+        <el-menu-item index="2-3" @click="exportToJSON">Export</el-menu-item>
+        <el-menu-item index="2-4" @click="clearImage">Clear</el-menu-item>
+      </el-submenu>
+      <el-submenu index="3" v-if="!!fabricCanvas">
+        <template slot="title">Edit</template>
+        <el-menu-item index="3-1" disabled>Remove Selected</el-menu-item>
+        <el-menu-item index="3-2" disabled>Insert Text</el-menu-item>
+        <el-menu-item index="3-3" disabled>Insert Image from URL</el-menu-item>
+        <el-menu-item index="3-4" @click="toggleDrawing"
+          >Enable/Disable Drawing</el-menu-item
+        >
+        <el-menu-item index="3-5" @click="undoDraw">Undo Draw</el-menu-item>
+        <el-menu-item index="3-6" @click="redoDraw">Redo Draw</el-menu-item>
+      </el-submenu>
     </el-menu>
     <el-alert
       v-if="!isEnableBackup"
@@ -29,54 +43,9 @@
     <div id="wrapper">
       <canvas ref="canvas" width="640" height="320"></canvas>
     </div>
-
-    <el-row :gutter="10" align="middle">
-      <el-col>
-        <el-table
-          :data="
-            tableData.filter(
-              (data) =>
-                !search ||
-                data.name.toLowerCase().includes(search.toLowerCase()) ||
-                data.category.toLowerCase().includes(search.toLowerCase())
-            )
-          "
-          :default-sort="{ prop: 'name', order: 'descending' }"
-          style="width: 100%"
-        >
-          <el-table-column fixed="left" width="50">
-            <template slot-scope="props">
-              <el-image
-                style="width: 40px; height: 40px"
-                :src="props.row.url"
-                fit="contain"
-                lazy
-              ></el-image>
-            </template>
-          </el-table-column>
-          <el-table-column prop="name" sortable label="Name">
-            <template slot="header">
-              <el-input
-                v-model="search"
-                size="mini"
-                placeholder="Name (Type to search)"
-                style="width: 90%"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column prop="category" sortable label="Category">
-          </el-table-column>
-          <el-table-column prop="element" sortable width="50">
-            <template slot-scope="props">
-              <ElementIcon :element="props.row.element" />
-            </template>
-          </el-table-column>
-          <el-table-column fixed="right" label="Operations" width="120">
-            <el-button type="primary" icon="el-icon-plus">Add</el-button>
-          </el-table-column>
-        </el-table>
-      </el-col>
-    </el-row>
+    <div id="control">
+      <ItemGrid />
+    </div>
   </div>
 </template>
 
@@ -89,23 +58,30 @@
   overflow: auto;
   resize: both;
 }
+
+#control {
+  width: 100vw;
+}
 </style>
 
 <script>
 import { fabric } from "fabric";
-import { default as enemyData } from "@/static/json/enemy-data.json";
+import ItemGrid from "./ItemGrid.vue";
 
 export default {
+  components: { ItemGrid },
   data() {
     return {
-      // 挿入対象の検索文字列
-      search: "",
-      // 挿入可能なエントリ一覧
-      tableData: enemyData.data,
       // 編集中のfabric.Canvas
       fabricCanvas: null,
+      // fabricCanvasの操作履歴
+      objectHistories: [],
+      // redo使用後ならtrue
+      isRedoing: false,
       // ページが閉じられた場合に自動で最新の編集データをlocalStorageに退避する
       isEnableBackup: true,
+      // 手書きモードが有効ならtrue
+      isFreehand: false,
     };
   },
   created() {
@@ -119,6 +95,18 @@ export default {
     const canvasElem = this.$refs.canvas;
     const fabricCanvas = new fabric.Canvas(canvasElem);
     this.fabricCanvas = fabricCanvas;
+
+    // Setup Drawing(TODO: 需要があれば可変にしたい)
+    fabricCanvas.freeDrawingBrush.color = "rgba(50,40,255,0.5)";
+    fabricCanvas.freeDrawingBrush.width = 10;
+
+    // Setup undo/redo
+    fabricCanvas.on("object:added", function () {
+      if (!this.isRedoing) {
+        this.objectHistories = [];
+      }
+      this.isRedoing = false;
+    });
 
     // insert test objects. TODO: remove
     fabricCanvas.add(
@@ -142,7 +130,6 @@ export default {
       fabricCanvas.setHeight(entries[0].contentRect.height);
     });
     resizeObserver.observe(document.getElementById("wrapper"));
-
     // Import from auto backup
     this.importFromLocalStorage();
   },
@@ -150,6 +137,25 @@ export default {
     // 指定されたurlを新規タブで開きます
     moveLink(url) {
       window.open(url, "_blank");
+    },
+    // 直前の操作を巻き戻します
+    undoDraw() {
+      // 一番最後に追加されたオブジェクトを取り出して退避
+      if (this.fabricCanvas._objects.length > 0) {
+        this.objectHistories.push(this.fabricCanvas._objects.pop());
+        this.fabricCanvas.renderAll();
+      }
+    },
+    // undoで取り消した操作をもとに戻します
+    redoDraw() {
+      if (this.objectHistories.length > 0) {
+        this.isRedoing = true;
+        this.fabricCanvas.add(this.objectHistories.pop());
+      }
+    },
+    // 手書き有効無効をトグルする
+    toggleDrawing() {
+      this.fabricCanvas.isDrawingMode = !this.fabricCanvas.isDrawingMode;
     },
     // 編集中の画像を保存します
     saveImage() {
@@ -208,7 +214,9 @@ export default {
         cancelButtonText: "Cancel",
       }).then(({ value }) => {
         try {
-          this.fabricCanvas.loadFromJSON(value, () => {});
+          this.fabricCanvas.loadFromJSON(value, () => {
+            this.$alert("Done.", "Import Notice");
+          });
         } catch (error) {
           console.error(error);
           this.$alert(error, "Import Notice");

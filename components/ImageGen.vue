@@ -17,7 +17,9 @@
         <template slot="title">Edit</template>
         <el-menu-item index="3-1" disabled>Remove Selected</el-menu-item>
         <el-menu-item index="3-2" disabled>Insert Text</el-menu-item>
-        <el-menu-item index="3-3" disabled>Insert Image from URL</el-menu-item>
+        <el-menu-item index="3-3" @click="insertImage"
+          >Insert Image from URL</el-menu-item
+        >
         <el-menu-item index="3-4" @click="toggleDrawing"
           >Enable/Disable Drawing</el-menu-item
         >
@@ -97,8 +99,8 @@ export default {
     this.fabricCanvas = fabricCanvas;
 
     // Setup Drawing(TODO: 需要があれば可変にしたい)
-    fabricCanvas.freeDrawingBrush.color = "rgba(50,40,255,0.5)";
-    fabricCanvas.freeDrawingBrush.width = 10;
+    fabricCanvas.freeDrawingBrush.color = "rgba(50,40,255,1.0)";
+    fabricCanvas.freeDrawingBrush.width = 6;
 
     // Setup undo/redo
     fabricCanvas.on("object:added", function () {
@@ -137,6 +139,17 @@ export default {
     // 指定されたurlを新規タブで開きます
     moveLink(url) {
       window.open(url, "_blank");
+    },
+    // 指定されたURLの画像を挿入します
+    insertImage() {
+      this.$prompt("Please paste the Image URL", "Insert Image", {
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
+      }).then(({ value }) => {
+        const img = new fabric.Image();
+        img.setSrc(value);
+        this.fabricCanvas.add(img);
+      });
     },
     // 直前の操作を巻き戻します
     undoDraw() {
